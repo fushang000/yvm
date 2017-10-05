@@ -10,9 +10,14 @@ public:
 
     _ElemType pop();
 
-    _ElemType peek();
+    _ElemType peek() const;
+
+    bool isEmpty() const;
 
 private:
+    Stack(const Stack &) = delete;
+    Stack& operator= (const Stack&) = delete;
+
     struct Node {
         _ElemType elem;
         Node * next;
@@ -39,11 +44,13 @@ inline _ElemType Stack<_ElemType>::pop(){
 }
 
 template<typename _ElemType>
-inline _ElemType Stack<_ElemType>::peek(){
-    if (top != nullptr) {
-        return top->elem;
-    }
-    return _ElemType(0);
+inline _ElemType Stack<_ElemType>::peek() const{
+    return top->elem;
+}
+
+template<typename _ElemType>
+bool Stack<_ElemType>::isEmpty() const {
+    return top==nullptr;
 }
 
 
