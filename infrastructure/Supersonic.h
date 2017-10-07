@@ -12,6 +12,7 @@
 #endif
 
 #include <cstdint>
+#include "RBTree.hpp"
 
 namespace ssvm{
     using u1 = std::uint_fast8_t;           //unsigned 1 byte
@@ -19,6 +20,7 @@ namespace ssvm{
     using u4 = std::uint_fast32_t;          //unsigned 4 bytes
     using machine_ptr =   void *;           //a pointer which pointed to an memory address
                                             //and  the bits of the ptr depends on its machine
-
+    template<typename _KeyType, typename _ValueType>
+    using map = RBTree<_KeyType, _ValueType>;
 }
 #endif //SSVM_INFRASTRUCTURE_SUPERSONIC_H
