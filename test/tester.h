@@ -2,9 +2,9 @@
 
 #include <ctime>
 #include <functional>
-#include <string>
 #include <iostream>
 #include <map>
+#include <cstring>
 
 namespace ssvm {
 	namespace test {
