@@ -4,76 +4,63 @@
 #include <unordered_map>
 #include <set>
 #include "../../infrastructure/Supersonic.h"
-
+#include "../tester.h"
 
 int main() {
-	clock_t startTime, endTime;
+	ssvm::test::TimeTester t;
 
-
-	std::cout << "#######################Insert 50000000#######################" << std::endl;
-	startTime = clock();
 	std::map<unsigned int, unsigned int> m;
-	for (size_t i = 0; i < 5000000; i++) {
-		m.insert(std::make_pair(i, i));
-	}
-	endTime = clock();
-	std::cout << "std::map:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
-
-	startTime = clock();
 	ssvm::map<unsigned int, unsigned int> tree;
-	for (size_t i = 0; i < 5000000; i++) {
-		tree.put(i, i);
-	}
-	endTime = clock();
-	std::cout << "ssvm::RBTree:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
-
-	startTime = clock();
 	std::unordered_map<unsigned int, unsigned int> um;
-	for (size_t i = 0; i < 5000000; i++) {
-		um.insert(std::make_pair(i, i));
-	}
-	endTime = clock();
-	std::cout << "std::unordered_map:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
-
-	startTime = clock();
 	std::set<unsigned int> st;
-	for (size_t i = 0; i < 5000000; i++) {
-		st.insert(i);
-	}
-	endTime = clock();
-	std::cout << "std::set:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
 
-	std::cout << "############################################################" << std::endl;
+	static const int TEST_TIMES = 5000000;
+
+	t.setHeader("Test For inserting 5000000 elements")
+		.setTask("std::map",[&m](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				m.insert(std::make_pair(i, i));
+			}
+		})
+		.setTask("ssvm::map",[&tree](void)->void{
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				tree.put(i, i);
+			}
+		})
+		.setTask("std::unordered_map", [&um](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				um.insert(std::make_pair(i, i));
+			}
+		})
+		.setTask("std::set", [&st](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				st.insert(i);
+			}
+		})();
 
 
-	std::cout << "#######################Delete 50000000#######################" << std::endl;
-	startTime = clock();
-	for (size_t i = 0; i < 5000000; i++) {
-		st.erase(st.find(i));
-	}
-	endTime = clock();
-	std::cout << "std::set:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
+	t.setHeader("Test For deleting 5000000 elements")
+		.setTask("std::map", [&m](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				m.erase(m.find(i));
+			}
+		})
+		.setTask("std::unordered_map", [&um](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				um.erase(um.find(i));
+			}
+		})
+		.setTask("ssvm::map", [&tree](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				tree.remove(i);
+			}
+		})
+		.setTask("std::set", [&st](void)->void {
+			for (size_t i = 0; i < TEST_TIMES; i++) {
+				st.erase(st.find(i));
+			}
+		})();
 
-	startTime = clock();
-	for (size_t i = 0; i < 5000000; i++) {
-		tree.remove(i);
-	}
-	endTime = clock();
-	std::cout << "ssvm::RBTree:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
-
-	startTime = clock();
-	for (size_t i = 0; i < 5000000; i++) {
-		m.erase(m.find(i));
-	}
-	endTime = clock();
-	std::cout << "std::map:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 << "ms" << std::endl;
-
-	startTime = clock();
-	for (size_t i = 0; i < 5000000; i++) {
-		um.erase(um.find(i));
-	}
-	endTime = clock();
-	std::cout << "std::unordered_map:" << static_cast<double>(endTime - startTime) / CLOCKS_PER_SEC * 1000 <<"ms"<< std::endl;
-	std::cout << "############################################################" << std::endl;
+	getchar();
 	return 0;
 }

@@ -3,10 +3,13 @@ project(ssvm)
 
 set(CMAKE_CXX_STANDARD 11)
 
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_DIR}/bin)
 
 set(SOURCE_FILES
-        classfile/AccessFlag.h
-        infrastructure/Stack.hpp infrastructure/RBTree.hpp infrastructure/Supersonic.h classfile/Common.h classfile/Common.h classfile/ConstantStructures.h test/infrastructure/Test_RBTree.cpp)
+infrastructure/RBTree.hpp 
+infrastructure/Stack.hpp 
+infrastructure/Supersonic.h
+test/infrastructure/Test_RBTree.cpp
+test/tester.h)
 
 add_executable(ssvm ${SOURCE_FILES})
