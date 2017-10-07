@@ -10,6 +10,6 @@ infrastructure/RBTree.hpp
 infrastructure/Stack.hpp 
 infrastructure/Supersonic.h
 test/infrastructure/Test_RBTree.cpp
-test/tester.h)
+test/Tester.h)
 
 add_executable(ssvm ${SOURCE_FILES})

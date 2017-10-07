@@ -1,10 +1,9 @@
 #include <iostream>
-#include <ctime>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include "../../infrastructure/Supersonic.h"
-#include "../tester.h"
+#include "../Tester.h"
 
 int main() {
 	ssvm::test::TimeTester t;
