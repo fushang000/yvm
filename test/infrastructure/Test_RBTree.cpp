@@ -13,7 +13,7 @@ int main() {
 	std::unordered_map<unsigned int, unsigned int> um;
 	std::set<unsigned int> st;
 
-	static const int TEST_TIMES = 50000;
+	static const int TEST_TIMES = 5000000;
 
 	t.setHeader("Correctness Verify")
 		.setTask("ssvm::map", [&tree](void)->void {
@@ -96,17 +96,17 @@ int main() {
 
 
 	t.setHeader("Test For random inserting and deleting")
-			.setTask("ssvm::map", [&tree](void)->void {
+		.setTask("ssvm::map", [&tree](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				int x, y, z;
 				x = std::rand();
 				y = std::rand();
 				z = std::rand();
-				std::cout << "Time:" << i << "|Add" << x << "," << y << "Remove:" << z << std::endl;
 				tree.put(x,y);
 				tree.remove(z);
 			}
-	})();
+		})();
+
 	getchar();
 	return 0;
 }
