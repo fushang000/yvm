@@ -18,35 +18,35 @@ int main() {
 	t.setHeader("Correctness Verify")
 		.setTask("ssvm::map", [&tree](void)->void {
 		//the following data were retrieved from <Introduction to Algorithm Trd Edition>
-		tree.put(26, 0);
+		tree.add(26, 0);
 
-		tree.put(17, 0);
-		tree.put(41, 0);
+		tree.add(17, 0);
+		tree.add(41, 0);
 
-		tree.put(14, 0);
-		tree.put(21, 0);
-		tree.put(30, 0);
-		tree.put(47, 0);
+		tree.add(14, 0);
+		tree.add(21, 0);
+		tree.add(30, 0);
+		tree.add(47, 0);
 
-		tree.put(10, 0);
-		tree.put(16, 0);
-		tree.put(19, 0);
-		tree.put(23, 0);
-		tree.put(28, 0);
-		tree.put(38, 0);
+		tree.add(10, 0);
+		tree.add(16, 0);
+		tree.add(19, 0);
+		tree.add(23, 0);
+		tree.add(28, 0);
+		tree.add(38, 0);
 
-		tree.put(7, 0);
-		tree.put(12, 0);
-		tree.put(15, 0);
-		tree.put(20, 0);
-		tree.put(35, 0);
-		tree.put(39, 0);
+		tree.add(7, 0);
+		tree.add(12, 0);
+		tree.add(15, 0);
+		tree.add(20, 0);
+		tree.add(35, 0);
+		tree.add(39, 0);
 
-		tree.put(3, 0);
-		tree.remove(17);
-		tree.remove(23);
-		tree.remove(19);
-		tree.remove(1024);
+		tree.add(3, 0);
+		tree.del(17);
+		tree.del(23);
+		tree.del(19);
+		tree.del(1024);
 	})();
 
 	t.setHeader("Test For inserting 5000000 elements")
@@ -57,7 +57,7 @@ int main() {
 		})
 		.setTask("ssvm::map",[&tree](void)->void{
 			for (size_t i = 0; i < TEST_TIMES; i++) {
-				tree.put(i, i);
+				tree.add(i, i);
 			}
 		})
 		.setTask("std::unordered_map", [&um](void)->void {
@@ -85,7 +85,7 @@ int main() {
 		})
 		.setTask("ssvm::map", [&tree](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
-				tree.remove(i);
+				tree.del(i);
 			}
 		})
 		.setTask("std::set", [&st](void)->void {
@@ -102,8 +102,8 @@ int main() {
 				x = std::rand();
 				y = std::rand();
 				z = std::rand();
-				tree.put(x,y);
-				tree.remove(z);
+				tree.add(x,y);
+				tree.del(z);
 			}
 		})();
 

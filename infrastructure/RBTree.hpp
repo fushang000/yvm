@@ -21,21 +21,25 @@ public:
 	explicit RBTree() {
 		root = nullptr;
 	}
-	void put(const _KeyType key, const _ValueType value);
+	void add(const _KeyType key, const _ValueType value);
 
-	void remove(const _KeyType key);
+	void del(const _KeyType key);
 
-	Node * minNode(Node * start);
+	_ValueType find(const _KeyType key);
 
 private:
-	void insertFixup(Node * current);
+	Node * minNode(Node * start);
+
+	void addFixup(Node * current);
+
 	void deleteFixup(Node * current);
 
 	void rotateLeft(Node *node);
-	void rotateRight(Node * node);
 
-private:
+	void rotateRight(Node * node);
+	
 	void transplant(Node *u, Node * v);
+	
 private:
 	inline bool isRed(Node * node) const {
 		return node->black == false;
@@ -51,7 +55,7 @@ private:
 };
 
 template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::put(const _KeyType key, const _ValueType value) {
+void RBTree<_KeyType, _ValueType>::add(const _KeyType key, const _ValueType value) {
 	Node * traverse = root;
 	Node * validNode = nullptr;
 	bool insertLeft = false;
@@ -92,11 +96,11 @@ void RBTree<_KeyType, _ValueType>::put(const _KeyType key, const _ValueType valu
 	newNode->black = false;
 	newNode->key = key;
 	newNode->value = value;
-	insertFixup(newNode);
+	addFixup(newNode);
 }
 
 template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::insertFixup(Node * current) {
+void RBTree<_KeyType, _ValueType>::addFixup(Node * current) {
 	while (current->parent && current->parent->black == false) {
 		if (current->parent->parent->left == current->parent) {
 			//if the father node is the left child of its father
@@ -154,7 +158,7 @@ void RBTree<_KeyType, _ValueType>::insertFixup(Node * current) {
 }
 
 template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::remove(const _KeyType key) {
+void RBTree<_KeyType, _ValueType>::del(const _KeyType key) {
 	if (root == nullptr) {
 		return;
 	}
@@ -340,6 +344,31 @@ void RBTree<_KeyType, _ValueType>::deleteFixup(Node * current) {
 			}
 		}
 		current->black = true;
+	}
+}
+
+template<typename _KeyType, typename _ValueType>
+_ValueType RBTree<_KeyType, _ValueType>::find(const _KeyType key) {
+	Node * traverse = root;
+
+	while (traverse != nullptr) {
+		if (key == traverse->key) {
+			break;
+		}
+		else if (key < traverse->key) {
+			traverse = traverse->left;
+		}
+		else if (key > traverse->key) {
+			traverse = traverse->right;
+		}
+	}
+
+	//if the specified key does not exist
+	if (traverse == nullptr) {
+		return;
+	}
+	else {
+		return traverse->value;
 	}
 }
 
