@@ -221,7 +221,7 @@ void RBTree<_KeyType, _ValueType>::remove(const _KeyType key) {
 		temp = minNode(traverse->right);
 		originalColor = temp->black;
 		successor = temp->right;
-
+		
 		if (temp->parent != traverse) {
 			if (temp->right) {
 				transplant(temp, temp->right);
@@ -250,65 +250,93 @@ void RBTree<_KeyType, _ValueType>::remove(const _KeyType key) {
 
 template<typename _KeyType, typename _ValueType>
 void RBTree<_KeyType, _ValueType>::deleteFixup(Node * current) {
-	while (current && current->black == true && current != root ) {
+	while (current  && current != root && current->black == true) {
 		if (current == current->parent->left) {
 			Node * brother = current->parent->right;
-			if (isRed(brother)) {
-				brother->black = true;
-				current->parent->black = false;
-				rotateLeft(current->parent);
-				brother = current->parent->right;
+			if (exist(brother)) {
+				if (isRed(brother)) {
+					brother->black = true;
+					current->parent->black = false;
+					rotateLeft(current->parent);
+					brother = current->parent->right;
+				}
+				else if (
+					(isBlack(brother) && !exist(brother->left) && !exist(brother->right)) ||
+					(isBlack(brother) && exist(brother->left) && isBlack(brother->left) && !exist(brother->right)) ||
+					(isBlack(brother) && exist(brother->right) && isBlack(brother->right) && !exist(brother->left)) ||
+					(isBlack(brother) && exist(brother->right) && isBlack(brother->right) && exist(brother->left) && isBlack(brother->left))
+					) {
+					brother->black = false;
+					current = current->parent;
+				}
+				else if (
+					(isBlack(brother) && exist(brother->left) && isRed(brother->left) && exist(brother->right) && isBlack(brother->right)) ||
+					(isBlack(brother) && exist(brother->left) && isRed(brother->left) && !exist(brother->right))
+					) {
+					brother->left->black = true;
+					brother->black = false;
+					rotateRight(brother);
+					brother = current->parent->right;
+				}
+				else if (exist(brother->right) &&
+					isBlack(brother) &&
+					isRed(brother->right)) {
+					brother->black = current->parent->black;
+					current->parent->black = true;
+					brother->right->black = true;
+					rotateLeft(current->parent);
+					current = root;
+				}
+				else {
+					static_assert(true, "should not reach here");
+				}
 			}
-			else if (exist(brother->left) && exist(brother->right) &&
-				isBlack(brother) && isBlack(brother->left) && isBlack(brother->right)) {
-				brother->black = false;
-				current = current->parent;
-			}
-			else if (exist(brother->left) && exist(brother->right) &&
-				isRed(brother->left) && isBlack(brother->right)) {
-				brother->left->black = true;
-				brother->black = false;
-				rotateRight(brother);
-				brother = current->parent->right;
-			}
-			else if (exist(brother->right) &&
-				isBlack(brother) &&
-				isRed(brother->right)) {
-				brother->black = current->parent->black;
-				current->parent->black = true;
-				brother->right->black = true;
-				rotateLeft(current->parent);
-				current = root;
+			else {
+				break;
 			}
 		}
 		else {
 			Node * brother = current->parent->left;
-			if (isRed(brother)) {
-				brother->black = true;
-				current->parent->black = false;
-				rotateRight(current->parent);
-				brother = current->parent->left;
+			if (exist(brother)) {
+				if (isRed(brother)) {
+					brother->black = true;
+					current->parent->black = false;
+					rotateRight(current->parent);
+					brother = current->parent->left;
+				}
+				else if (
+					(isBlack(brother) && !exist(brother->left) && !exist(brother->right)) ||
+					(isBlack(brother) && exist(brother->left) && isBlack(brother->left) && !exist(brother->right)) ||
+					(isBlack(brother) && exist(brother->right) && isBlack(brother->right) && !exist(brother->left)) ||
+					(isBlack(brother) && exist(brother->right) && isBlack(brother->right) && exist(brother->left) && isBlack(brother->left))
+					) {
+					brother->black = false;
+					current = current->parent;
+				}
+				else if (
+					(isBlack(brother) && exist(brother->right) && isRed(brother->right) && exist(brother->left) && isBlack(brother->left)) ||
+					(isBlack(brother) && exist(brother->right) && isRed(brother->right) && !exist(brother->left))
+					) {
+					brother->right->black = true;
+					brother->black = false;
+					rotateLeft(brother);
+					brother = current->parent->left;
+				}
+				else if (exist(brother->left) &&
+					isBlack(brother) &&
+					isRed(brother->left)) {
+					brother->black = current->parent->black;
+					current->parent->black = true;
+					brother->left->black = true;
+					rotateRight(current->parent);
+					current = root;
+				}
+				else {
+					static_assert(true, "should not reach here");
+				}
 			}
-			else if (exist(brother->left) && exist(brother->right) &&
-				isBlack(brother) && isBlack(brother->left) && isBlack(brother->right)) {
-				brother->black = false;
-				current = current->parent;
-			}
-			else if (exist(brother->left) && exist(brother->right) &&
-				isRed(brother->right) && isBlack(brother->left)) {
-				brother->right->black = true;
-				brother->black = false;
-				rotateLeft(brother);
-				brother = current->parent->left;
-			}
-			else if (exist(brother->left) &&
-				isBlack(brother) &&
-				isRed(brother->left)) {
-				brother->black = current->parent->black;
-				current->parent->black = true;
-				brother->left->black = true;
-				rotateRight(current->parent);
-				current = root;
+			else {
+				break;
 			}
 		}
 		current->black = true;

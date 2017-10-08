@@ -44,6 +44,8 @@ int main() {
 
 		tree.put(3, 0);
 		tree.remove(17);
+		tree.remove(23);
+		tree.remove(19);
 		tree.remove(1024);
 	})();
 
@@ -96,9 +98,13 @@ int main() {
 	t.setHeader("Test For random inserting and deleting")
 			.setTask("ssvm::map", [&tree](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
-				std::cout << "time" << i;
-				tree.put(std::rand(),std::rand());
-				tree.remove(std::rand());
+				int x, y, z;
+				x = std::rand();
+				y = std::rand();
+				z = std::rand();
+				std::cout << "Time:" << i << "|Add" << x << "," << y << "Remove:" << z << std::endl;
+				tree.put(x,y);
+				tree.remove(z);
 			}
 	})();
 	getchar();
