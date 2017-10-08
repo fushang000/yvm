@@ -3,13 +3,17 @@ project(ssvm)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(EXECUTABLE_OUTPUT_PATH ${BUILD_DIR}/bin)
-
-set(SOURCE_FILES
+set(RBTREE_SOURCE_FILES
 infrastructure/RBTree.hpp 
-infrastructure/Stack.hpp 
 infrastructure/Supersonic.h
 test/infrastructure/Test_RBTree.cpp
 test/Tester.h)
 
-add_executable(ssvm ${SOURCE_FILES})
+set(STRING_SOURCE_FILES
+infrastructure/String.h
+infrastructure/String.cpp
+test/infrastructure/Test_String.cpp)
+
+
+add_executable(test-rbtree ${RBTREE_SOURCE_FILES})
+add_executable(test-string ${STRING_SOURCE_FILES})
