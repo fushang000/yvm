@@ -15,6 +15,38 @@ int main() {
 
 	static const int TEST_TIMES = 50000;
 
+	t.setHeader("Correctness Verify")
+		.setTask("ssvm::map", [&tree](void)->void {
+		//the following data were retrieved from <Introduction to Algorithm Trd Edition>
+		tree.put(26, 0);
+
+		tree.put(17, 0);
+		tree.put(41, 0);
+
+		tree.put(14, 0);
+		tree.put(21, 0);
+		tree.put(30, 0);
+		tree.put(47, 0);
+
+		tree.put(10, 0);
+		tree.put(16, 0);
+		tree.put(19, 0);
+		tree.put(23, 0);
+		tree.put(28, 0);
+		tree.put(38, 0);
+
+		tree.put(7, 0);
+		tree.put(12, 0);
+		tree.put(15, 0);
+		tree.put(20, 0);
+		tree.put(35, 0);
+		tree.put(39, 0);
+
+		tree.put(3, 0);
+		tree.remove(17);
+		tree.remove(1024);
+	})();
+
 	t.setHeader("Test For inserting 5000000 elements")
 		.setTask("std::map",[&m](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {

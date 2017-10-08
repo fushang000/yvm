@@ -97,68 +97,60 @@ void RBTree<_KeyType, _ValueType>::put(const _KeyType key, const _ValueType valu
 
 template<typename _KeyType, typename _ValueType>
 void RBTree<_KeyType, _ValueType>::insertFixup(Node * current) {
-	/*if (current->parent == nullptr) {
-		current->black = true;
-	}
-	else if (current->parent->black) {
-		//nop
-	}
-	else {*/
-		while (current->parent && current->parent->black == false) {
-			if (current->parent->parent->left == current->parent) {
-				//if the father node is the left child of its father
-				Node * uncle = current->parent->parent->right;
-				if (uncle && uncle->black == false) {
-					//case 1
-					current->parent->black = true;
-					uncle->black = true;
-					current->parent->parent->black = false;
-					current = current->parent->parent;
-				}
-				else if (current == current->parent->right) {
-					//case 2
-					current = current->parent;
-					rotateLeft(current);
-				}
-				else if (current == current->parent->left) {
-					//case 3
-					current->parent->black = true;
-					current->parent->parent->black = false;
-					rotateRight(current->parent->parent);
-				}
-				else {
-					static_assert(true, "should not reach here");
-				}
+	while (current->parent && current->parent->black == false) {
+		if (current->parent->parent->left == current->parent) {
+			//if the father node is the left child of its father
+			Node * uncle = current->parent->parent->right;
+			if (uncle && uncle->black == false) {
+				//case 1
+				current->parent->black = true;
+				uncle->black = true;
+				current->parent->parent->black = false;
+				current = current->parent->parent;
+			}
+			else if (current == current->parent->right) {
+				//case 2
+				current = current->parent;
+				rotateLeft(current);
+			}
+			else if (current == current->parent->left) {
+				//case 3
+				current->parent->black = true;
+				current->parent->parent->black = false;
+				rotateRight(current->parent->parent);
 			}
 			else {
-				//otherwise, the father node is the right child of its father
-				Node * uncle = current->parent->parent->left;
-				if (uncle && uncle->black == false) {
-					//case 1
-					current->parent->black = true;
-					uncle->black = true;
-					current->parent->parent->black = false;
-					current = current->parent->parent;
-				}
-				else if (current == current->parent->left) {
-					//case 2
-					current = current->parent;
-					rotateRight(current);
-				}
-				else if (current == current->parent->right) {
-					//case 3
-					current->parent->black = true;
-					current->parent->parent->black = false;
-					rotateLeft(current->parent->parent);
-				}
-				else {
-					static_assert(true, "should not reach here");
-				}
+				static_assert(true, "should not reach here");
 			}
-
 		}
-		root->black = true;
-	//}
+		else {
+			//otherwise, the father node is the right child of its father
+			Node * uncle = current->parent->parent->left;
+			if (uncle && uncle->black == false) {
+				//case 1
+				current->parent->black = true;
+				uncle->black = true;
+				current->parent->parent->black = false;
+				current = current->parent->parent;
+			}
+			else if (current == current->parent->left) {
+				//case 2
+				current = current->parent;
+				rotateRight(current);
+			}
+			else if (current == current->parent->right) {
+				//case 3
+				current->parent->black = true;
+				current->parent->parent->black = false;
+				rotateLeft(current->parent->parent);
+			}
+			else {
+				static_assert(true, "should not reach here");
+			}
+		}
+
+	}
+	root->black = true;
 }
 
 template<typename _KeyType, typename _ValueType>
@@ -193,6 +185,9 @@ void RBTree<_KeyType, _ValueType>::remove(const _KeyType key) {
 		if (traverse == root) {
 			root = nullptr;
 			delete temp;
+			if (successor && originalColor == true) {
+				deleteFixup(successor);
+			}
 			return;
 		}
 		else {
@@ -210,12 +205,14 @@ void RBTree<_KeyType, _ValueType>::remove(const _KeyType key) {
 	}
 	else if (traverse->left == nullptr && traverse->right != nullptr) {
 		successor = traverse->right;
+		successor->black = originalColor;
 		transplant(traverse, traverse->right);
-		delete traverse;
+		delete temp;
 		return;
 	}
 	else if (traverse->right == nullptr && traverse->left != nullptr) {
 		successor = traverse->left;
+		successor->black = originalColor;
 		transplant(traverse, traverse->left);
 		delete temp;
 		return;
