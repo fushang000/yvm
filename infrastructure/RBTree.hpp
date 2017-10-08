@@ -5,6 +5,14 @@
 
 template<typename _KeyType, typename _ValueType>
 class RBTree {
+	using _ResolvedKeyType = typename std::conditional<std::is_class<_KeyType>::value,
+            typename std::add_lvalue_reference<_KeyType>::type,
+		_KeyType>::type ;
+
+	using _ResolvedValueType = typename  std::conditional<std::is_class<_ValueType>::value,
+            typename std::add_lvalue_reference<_ValueType>::type,
+		_ValueType>::type;
+
 public:
 	struct Node {
 		explicit Node() :left(nullptr), right(nullptr), parent(nullptr) {}
@@ -18,16 +26,35 @@ public:
 		bool black;
 	};
 public:
-	explicit RBTree() {
+	inline explicit RBTree() {
 		root = nullptr;
 	}
-	void add(const _KeyType key, const _ValueType value);
+
+	inline ~RBTree() {
+		clear();
+	}
+
+	inline bool empty() {
+		return root == nullptr ? true : false;
+	}
+
+	inline void clear() {
+		recursiveClear(root);
+		root = nullptr;
+	}
+	
+public :
+	void add(_ResolvedKeyType key,_ResolvedValueType value);
 
 	void del(const _KeyType key);
 
-	_ValueType find(const _KeyType key);
+	bool exist(const _KeyType key);
+
+	_ValueType get(const _KeyType key);
 
 private:
+	void recursiveClear(Node * node);
+	
 	Node * minNode(Node * start);
 
 	void addFixup(Node * current);
@@ -55,7 +82,7 @@ private:
 };
 
 template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::add(const _KeyType key, const _ValueType value) {
+void RBTree<_KeyType, _ValueType>::add(_ResolvedKeyType key, _ResolvedValueType value) {
 	Node * traverse = root;
 	Node * validNode = nullptr;
 	bool insertLeft = false;
@@ -97,64 +124,6 @@ void RBTree<_KeyType, _ValueType>::add(const _KeyType key, const _ValueType valu
 	newNode->key = key;
 	newNode->value = value;
 	addFixup(newNode);
-}
-
-template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::addFixup(Node * current) {
-	while (current->parent && current->parent->black == false) {
-		if (current->parent->parent->left == current->parent) {
-			//if the father node is the left child of its father
-			Node * uncle = current->parent->parent->right;
-			if (uncle && uncle->black == false) {
-				//case 1
-				current->parent->black = true;
-				uncle->black = true;
-				current->parent->parent->black = false;
-				current = current->parent->parent;
-			}
-			else if (current == current->parent->right) {
-				//case 2
-				current = current->parent;
-				rotateLeft(current);
-			}
-			else if (current == current->parent->left) {
-				//case 3
-				current->parent->black = true;
-				current->parent->parent->black = false;
-				rotateRight(current->parent->parent);
-			}
-			else {
-				static_assert(true, "should not reach here");
-			}
-		}
-		else {
-			//otherwise, the father node is the right child of its father
-			Node * uncle = current->parent->parent->left;
-			if (uncle && uncle->black == false) {
-				//case 1
-				current->parent->black = true;
-				uncle->black = true;
-				current->parent->parent->black = false;
-				current = current->parent->parent;
-			}
-			else if (current == current->parent->left) {
-				//case 2
-				current = current->parent;
-				rotateRight(current);
-			}
-			else if (current == current->parent->right) {
-				//case 3
-				current->parent->black = true;
-				current->parent->parent->black = false;
-				rotateLeft(current->parent->parent);
-			}
-			else {
-				static_assert(true, "should not reach here");
-			}
-		}
-
-	}
-	root->black = true;
 }
 
 template<typename _KeyType, typename _ValueType>
@@ -253,6 +222,191 @@ void RBTree<_KeyType, _ValueType>::del(const _KeyType key) {
 }
 
 template<typename _KeyType, typename _ValueType>
+bool RBTree<_KeyType, _ValueType>::exist(const _KeyType key) {
+	Node * traverse = root;
+
+	while (traverse != nullptr) {
+		if (key == traverse->key) {
+			break;
+		}
+		else if (key < traverse->key) {
+			traverse = traverse->left;
+		}
+		else if (key > traverse->key) {
+			traverse = traverse->right;
+		}
+	}
+
+	//if the specified key does not exist
+	if (traverse == nullptr) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+template<typename _KeyType, typename _ValueType>
+_ValueType RBTree<_KeyType, _ValueType>::get(const _KeyType key) {
+	Node * traverse = root;
+
+	while (traverse != nullptr) {
+		if (key == traverse->key) {
+			break;
+		}
+		else if (key < traverse->key) {
+			traverse = traverse->left;
+		}
+		else if (key > traverse->key) {
+			traverse = traverse->right;
+		}
+	}
+
+	return traverse->value;
+}
+
+template<typename _KeyType, typename _ValueType>
+void RBTree<_KeyType, _ValueType>::recursiveClear(Node * node) {
+	if (node == nullptr) {
+		return;
+	}
+	recursiveClear(node->left);
+	recursiveClear(node->right);
+	delete node;
+}
+
+template<typename _KeyType, typename _ValueType>
+typename RBTree<_KeyType, _ValueType>::Node * RBTree<_KeyType, _ValueType>::minNode(Node * start) {
+	if (root == nullptr) {
+		return nullptr;
+	}
+
+	Node *temp = start;
+
+	while (temp->left != nullptr) {
+		temp = temp->left;
+	}
+	return temp;
+}
+
+template<typename _KeyType, typename _ValueType>
+void RBTree<_KeyType, _ValueType>::rotateLeft(Node * node) {
+	Node * rightNode = node->right;
+	node->right = rightNode->left;
+	if (rightNode->left != nullptr) {
+		rightNode->left->parent = node;
+	}
+	rightNode->parent = node->parent;
+
+	if (node->parent == nullptr) {
+		root = rightNode;
+	}
+	else if (node->parent->left == node) {
+		node->parent->left = rightNode;
+	}
+	else {
+		node->parent->right = rightNode;
+	}
+	rightNode->left = node;
+	node->parent = rightNode;
+}
+
+template<typename _KeyType, typename _ValueType>
+void RBTree<_KeyType, _ValueType>::rotateRight(Node * node) {
+	Node * leftNode = node->left;
+	node->left = leftNode->right;
+	if (leftNode->right != nullptr) {
+		leftNode->right->parent = node;
+	}
+
+	leftNode->parent = node->parent;
+
+	if (node->parent == nullptr) {
+		root = leftNode;
+	}
+	else if (node->parent->right == node) {
+		node->parent->right = leftNode;
+	}
+	else {
+		node->parent->left = leftNode;
+	}
+	leftNode->right = node;
+	node->parent = leftNode;
+}
+
+template<typename _KeyType, typename _ValueType>
+void RBTree<_KeyType, _ValueType>::transplant(Node * u, Node * v) {
+	if (u->parent == nullptr) {
+		root = v;
+	}
+	else if (u->parent->left == u) {
+		u->parent->left = v;
+	}
+	else {
+		u->parent->right = v;
+	}
+	v->parent = u->parent;
+}
+
+template<typename _KeyType, typename _ValueType>
+void RBTree<_KeyType, _ValueType>::addFixup(Node * current) {
+	while (current->parent && current->parent->black == false) {
+		if (current->parent->parent->left == current->parent) {
+			//if the father node is the left child of its father
+			Node * uncle = current->parent->parent->right;
+			if (uncle && uncle->black == false) {
+				//case 1
+				current->parent->black = true;
+				uncle->black = true;
+				current->parent->parent->black = false;
+				current = current->parent->parent;
+			}
+			else if (current == current->parent->right) {
+				//case 2
+				current = current->parent;
+				rotateLeft(current);
+			}
+			else if (current == current->parent->left) {
+				//case 3
+				current->parent->black = true;
+				current->parent->parent->black = false;
+				rotateRight(current->parent->parent);
+			}
+			else {
+				static_assert(true, "should not reach here");
+			}
+		}
+		else {
+			//otherwise, the father node is the right child of its father
+			Node * uncle = current->parent->parent->left;
+			if (uncle && uncle->black == false) {
+				//case 1
+				current->parent->black = true;
+				uncle->black = true;
+				current->parent->parent->black = false;
+				current = current->parent->parent;
+			}
+			else if (current == current->parent->left) {
+				//case 2
+				current = current->parent;
+				rotateRight(current);
+			}
+			else if (current == current->parent->right) {
+				//case 3
+				current->parent->black = true;
+				current->parent->parent->black = false;
+				rotateLeft(current->parent->parent);
+			}
+			else {
+				static_assert(true, "should not reach here");
+			}
+		}
+
+	}
+	root->black = true;
+}
+
+template<typename _KeyType, typename _ValueType>
 void RBTree<_KeyType, _ValueType>::deleteFixup(Node * current) {
 	while (current  && current != root && current->black == true) {
 		if (current == current->parent->left) {
@@ -346,104 +500,5 @@ void RBTree<_KeyType, _ValueType>::deleteFixup(Node * current) {
 		current->black = true;
 	}
 }
-
-template<typename _KeyType, typename _ValueType>
-_ValueType RBTree<_KeyType, _ValueType>::find(const _KeyType key) {
-	Node * traverse = root;
-
-	while (traverse != nullptr) {
-		if (key == traverse->key) {
-			break;
-		}
-		else if (key < traverse->key) {
-			traverse = traverse->left;
-		}
-		else if (key > traverse->key) {
-			traverse = traverse->right;
-		}
-	}
-
-	//if the specified key does not exist
-	if (traverse == nullptr) {
-		return;
-	}
-	else {
-		return traverse->value;
-	}
-}
-
-template<typename _KeyType, typename _ValueType>
-typename RBTree<_KeyType, _ValueType>::Node * RBTree<_KeyType, _ValueType>::minNode(Node * start) {
-	if (root == nullptr) {
-		return nullptr;
-	}
-
-	Node *temp = start;
-
-	while (temp->left != nullptr) {
-		temp = temp->left;
-	}
-	return temp;
-}
-
-template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::rotateLeft(Node * node) {
-	Node * rightNode = node->right;
-	node->right = rightNode->left;
-	if (rightNode->left != nullptr) {
-		rightNode->left->parent = node;
-	}
-	rightNode->parent = node->parent;
-
-	if (node->parent == nullptr) {
-		root = rightNode;
-	}
-	else if (node->parent->left == node) {
-		node->parent->left = rightNode;
-	}
-	else {
-		node->parent->right = rightNode;
-	}
-	rightNode->left = node;
-	node->parent = rightNode;
-}
-
-template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::rotateRight(Node * node) {
-	Node * leftNode = node->left;
-	node->left = leftNode->right;
-	if (leftNode->right != nullptr) {
-		leftNode->right->parent = node;
-	}
-
-	leftNode->parent = node->parent;
-
-	if (node->parent == nullptr) {
-		root = leftNode;
-	}
-	else if (node->parent->right == node) {
-		node->parent->right = leftNode;
-	}
-	else {
-		node->parent->left = leftNode;
-	}
-	leftNode->right = node;
-	node->parent = leftNode;
-}
-
-template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::transplant(Node * u, Node * v) {
-	if (u->parent == nullptr) {
-		root = v;
-	}
-	else if (u->parent->left == u) {
-		u->parent->left = v;
-	}
-	else {
-		u->parent->right = v;
-	}
-	v->parent = u->parent;
-}
-
 
 #endif //INFRASTRUCTURE_RBTREE_H

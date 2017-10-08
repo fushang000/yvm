@@ -5,6 +5,8 @@
 #include "../../infrastructure/Supersonic.h"
 #include "../Tester.h"
 
+class EmptyClass {};
+
 int main() {
 	ssvm::test::TimeTester t;
 
@@ -13,7 +15,7 @@ int main() {
 	std::unordered_map<unsigned int, unsigned int> um;
 	std::set<unsigned int> st;
 
-	static const int TEST_TIMES = 5000000;
+	static const int TEST_TIMES = 5000;
 
 	t.setHeader("Correctness Verify")
 		.setTask("ssvm::map", [&tree](void)->void {
@@ -107,6 +109,32 @@ int main() {
 			}
 		})();
 
-	getchar();
+	tree.clear();
+	m.clear();
+	um.clear();
+	st.clear();
+
+	if (tree.empty()) {
+		std::cout << "Empty." << std::endl;
+	}
+	tree.add(1, 1024);
+	tree.add(2, 1024);
+	tree.add(3, 1024);
+
+	if (tree.exist(6)) {
+		tree.del(6);
+		std::cout << "Delete:6" << std::endl;
+	}
+	else if (tree.exist(7)) {
+		std::cout << "Find:7" << std::endl;
+	}
+	else if (tree.exist(3)) {
+		std::cout << "Find:3" << std::endl;
+	}
+
+	ssvm::map<int, EmptyClass> classMap;
+	EmptyClass ec;
+	classMap.add(1,ec);
+
 	return 0;
 }

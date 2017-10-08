@@ -7,7 +7,7 @@ set(RBTREE_SOURCE_FILES
 infrastructure/RBTree.hpp 
 infrastructure/Supersonic.h
 test/infrastructure/Test_RBTree.cpp
-test/Tester.h)
+test/Tester.h infrastructure/TypeTrait.h)
 
 set(STRING_SOURCE_FILES
 infrastructure/String.h
