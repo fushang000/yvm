@@ -46,11 +46,11 @@ public:
 public :
 	void add(_ResolvedKeyType key,_ResolvedValueType value);
 
-	void del(const _KeyType key);
+	void del(_ResolvedKeyType  key);
 
-	bool exist(const _KeyType key);
+	bool exist(_ResolvedKeyType  key);
 
-	_ValueType get(const _KeyType key);
+	_ValueType get(_ResolvedKeyType  key);
 
 private:
 	void recursiveClear(Node * node);
@@ -127,7 +127,7 @@ void RBTree<_KeyType, _ValueType>::add(_ResolvedKeyType key, _ResolvedValueType 
 }
 
 template<typename _KeyType, typename _ValueType>
-void RBTree<_KeyType, _ValueType>::del(const _KeyType key) {
+void RBTree<_KeyType, _ValueType>::del(_ResolvedKeyType key) {
 	if (root == nullptr) {
 		return;
 	}
@@ -222,7 +222,7 @@ void RBTree<_KeyType, _ValueType>::del(const _KeyType key) {
 }
 
 template<typename _KeyType, typename _ValueType>
-bool RBTree<_KeyType, _ValueType>::exist(const _KeyType key) {
+bool RBTree<_KeyType, _ValueType>::exist(_ResolvedKeyType key) {
 	Node * traverse = root;
 
 	while (traverse != nullptr) {
@@ -247,7 +247,7 @@ bool RBTree<_KeyType, _ValueType>::exist(const _KeyType key) {
 }
 
 template<typename _KeyType, typename _ValueType>
-_ValueType RBTree<_KeyType, _ValueType>::get(const _KeyType key) {
+_ValueType RBTree<_KeyType, _ValueType>::get(_ResolvedKeyType key) {
 	Node * traverse = root;
 
 	while (traverse != nullptr) {

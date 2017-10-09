@@ -7,6 +7,7 @@
 
 class EmptyClass {};
 
+
 int main() {
 	ssvm::test::TimeTester t;
 
@@ -15,10 +16,10 @@ int main() {
 	std::unordered_map<unsigned int, unsigned int> um;
 	std::set<unsigned int> st;
 
-	static const int TEST_TIMES = 5000;
+	static const int TEST_TIMES = 5000000;
 
 	t.setHeader("Correctness Verify")
-		.setTask("ssvm::map", [&tree](void)->void {
+		.addTask("ssvm::map", [&tree](void)->void {
 		//the following data were retrieved from <Introduction to Algorithm Trd Edition>
 		tree.add(26, 0);
 
@@ -51,54 +52,54 @@ int main() {
 		tree.del(1024);
 	})();
 
-	t.setHeader("Test For inserting 5000000 elements")
-		.setTask("std::map",[&m](void)->void {
+	t.setHeader("Time Test For inserting 5000000 elements")
+		.addTask("std::map",[&m](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				m.insert(std::make_pair(i, i));
 			}
 		})
-		.setTask("ssvm::map",[&tree](void)->void{
+		.addTask("ssvm::map",[&tree](void)->void{
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				tree.add(i, i);
 			}
 		})
-		.setTask("std::unordered_map", [&um](void)->void {
+		.addTask("std::unordered_map", [&um](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				um.insert(std::make_pair(i, i));
 			}
 		})
-		.setTask("std::set", [&st](void)->void {
+		.addTask("std::set", [&st](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				st.insert(i);
 			}
 		})();
 
 
-	t.setHeader("Test For deleting 5000000 elements")
-		.setTask("std::map", [&m](void)->void {
+	t.setHeader("Time Test For deleting 5000000 elements")
+		.addTask("std::map", [&m](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				m.erase(m.find(i));
 			}
 		})
-		.setTask("std::unordered_map", [&um](void)->void {
+		.addTask("std::unordered_map", [&um](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				um.erase(um.find(i));
 			}
 		})
-		.setTask("ssvm::map", [&tree](void)->void {
+		.addTask("ssvm::map", [&tree](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				tree.del(i);
 			}
 		})
-		.setTask("std::set", [&st](void)->void {
+		.addTask("std::set", [&st](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				st.erase(st.find(i));
 			}
 		})();
 
 
-	t.setHeader("Test For random inserting and deleting")
-		.setTask("ssvm::map", [&tree](void)->void {
+	t.setHeader("Time Test For random inserting and deleting")
+		.addTask("ssvm::map", [&tree](void)->void {
 			for (size_t i = 0; i < TEST_TIMES; i++) {
 				int x, y, z;
 				x = std::rand();
@@ -109,32 +110,26 @@ int main() {
 			}
 		})();
 
-	tree.clear();
-	m.clear();
-	um.clear();
-	st.clear();
-
-	if (tree.empty()) {
-		std::cout << "Empty." << std::endl;
-	}
-	tree.add(1, 1024);
-	tree.add(2, 1024);
-	tree.add(3, 1024);
-
-	if (tree.exist(6)) {
-		tree.del(6);
-		std::cout << "Delete:6" << std::endl;
-	}
-	else if (tree.exist(7)) {
-		std::cout << "Find:7" << std::endl;
-	}
-	else if (tree.exist(3)) {
-		std::cout << "Find:3" << std::endl;
-	}
-
-	ssvm::map<int, EmptyClass> classMap;
-	EmptyClass ec;
-	classMap.add(1,ec);
-
+	ssvm::test::AssertTester at;
+	at.addCondition("clear and check empty", [&tree](void)->bool {
+		tree.clear();
+		return tree.empty();
+	})
+		.addCondition("add 1 but find 3", [&tree](void)->bool {
+		tree.add(1, 1024);
+		return tree.exist(3);
+	})
+		.addCondition("add 7 and find 7", [&tree](void)->bool {
+		tree.add(7, 1024);
+		return tree.exist(7);
+	})
+		.addCondition("del 7 and find 7", [&tree](void)->bool {
+		tree.del(7);
+		return tree.exist(7);
+	})
+		.addCondition("get key 1's value", [&tree](void)->bool {
+		return tree.get(1);
+	})();
+	getchar();
 	return 0;
 }
