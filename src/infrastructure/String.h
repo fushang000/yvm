@@ -13,14 +13,10 @@
 */
 class String {
 public:
-	String(const wchar_t * str) {
-		raw = new wchar_t[len];
-
+	String() {
 	}
 
-	void print() {
-		std::cout << raw;
-	}
+	void print();
 
 private:
 	volatile int ref;
